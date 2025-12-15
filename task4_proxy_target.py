@@ -76,4 +76,5 @@ df_final.to_csv(final_path, index=False)
 print("Task 4 completed!")
 print("Final dataset saved at:", final_path)
 print("Sample of target column:")
-print(df_final[['CustomerId','is_high_risk']].head())
+print(df_final[['CustomerId', 'is_high_risk']].head())
+

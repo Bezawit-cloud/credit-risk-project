@@ -21,7 +21,9 @@ import mlflow.sklearn
 # ------------------------
 # 1️⃣ Load Processed Data
 # ------------------------
-data_path = r"C:\Users\bezis\Downloads\credit-risk-project\data\processed\features_woe_with_target.csv"
+data_path = (
+    r"C:\Users\bezis\Downloads\credit-risk-project\data\processed\features_woe_with_target.csv"
+)
 df = pd.read_csv(data_path)
 
 # Separate features and target

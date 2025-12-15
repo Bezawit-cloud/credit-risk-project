@@ -47,12 +47,13 @@ models = {
             ("clf", LogisticRegression(random_state=42)),
         ]
     ),
-    "RandomForest": Pipeline(
-        [
-            ("scaler", StandardScaler()),  # optional for RF but keeps pipeline consistent
-            ("clf", RandomForestClassifier(random_state=42)),
-        ]
-    ),
+"RandomForest": Pipeline(
+    [
+        # optional for RF but keeps pipeline consistent
+        ("scaler", StandardScaler()),
+        ("clf", RandomForestClassifier(random_state=42)),
+    ]
+),
 }
 
 # Hyperparameter grids for Grid Search
@@ -115,6 +116,5 @@ with mlflow.start_run(run_name="Best_Model_Registration"):
         artifact_path="model",
         registered_model_name="CreditRiskModel"
     )
-
 print("Best model registered in MLflow Model Registry 🚀")
 

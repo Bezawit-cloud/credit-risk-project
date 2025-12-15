@@ -59,7 +59,7 @@ def create_proxy_target(df: pd.DataFrame) -> pd.DataFrame:
 # ------------------------
 def split_features_target(df: pd.DataFrame):
     print("Splitting features and target...")
-    X = df.drop(columns=["CustomerId", "risk_label"])
+    X = df.drop(columns=["risk_label"])  # Keep CustomerId in X
     y = df["risk_label"]
     return X, y
 
@@ -85,27 +85,31 @@ def build_preprocessing_pipeline(numeric_features, categorical_features):
     return preprocessor
 
 # ------------------------
-# 7️⃣ Apply WOE & IV using optbinning (fixed)
+# 7️⃣ Apply WOE & IV using optbinning
 # ------------------------
 def apply_woe(X, y):
     print("Applying WOE transformation using optbinning...")
     X_woe = pd.DataFrame(index=X.index)
     iv_list = []
 
+    # Keep CustomerId column as-is
+    if "CustomerId" in X.columns:
+        X_woe["CustomerId"] = X["CustomerId"]
+
     for col in X.columns:
+        if col == "CustomerId":
+            continue  # Skip CustomerId for WOE
         dtype = "numerical" if pd.api.types.is_numeric_dtype(X[col]) else "categorical"
 
         optb = OptimalBinning(name=col, dtype=dtype, solver="cp")
         try:
             optb.fit(X[col], y)
-            # Build the binning table to access IV
-            optb.binning_table.build()
+            optb.binning_table.build()  # Ensure IV can be accessed
             X_woe[col] = optb.transform(X[col], metric="woe")
             iv = optb.binning_table.iv
             iv_list.append({"feature": col, "iv": iv})
         except Exception as e:
             print(f"Skipping column {col} due to error: {e}")
-            # Fill with 0 WOE and IV
             X_woe[col] = 0
             iv_list.append({"feature": col, "iv": 0})
 
@@ -126,9 +130,7 @@ def save_processed_data(X, y, processed_folder):
 # 9️⃣ Main Function
 # ------------------------
 def main():
-    # Absolute path to raw CSV
     csv_path = r"C:\Users\bezis\Downloads\credit-risk-project\data\data.csv"
-    # Folder to save processed files
     processed_folder = r"C:\Users\bezis\Downloads\credit-risk-project\data\processed"
 
     df = load_data(csv_path)
@@ -139,7 +141,6 @@ def main():
     X, y = split_features_target(agg_df)
     save_processed_data(X, y, processed_folder)
 
-    # Apply WOE & IV and save
     X_woe, iv_df = apply_woe(X, y)
     os.makedirs(processed_folder, exist_ok=True)
     X_woe.to_csv(os.path.join(processed_folder, "features_woe.csv"), index=False)

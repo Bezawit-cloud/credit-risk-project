@@ -43,7 +43,10 @@ X_train, X_test, y_train, y_test = train_test_split(
 models = {
     "LogisticRegression": Pipeline(
         [
-            ("scaler", StandardScaler()),
+           (
+    "scaler", StandardScaler()
+),  # optional for RF but keeps pipeline consistent
+
             ("clf", LogisticRegression(random_state=42)),
         ]
     ),
@@ -107,9 +110,7 @@ print("Task 5 Completed! Check MLflow UI for detailed logs.")
 # ------------------------
 # 5️⃣ Register Best Model
 # ------------------------
-
 best_model_name = "RandomForest"
-
 with mlflow.start_run(run_name="Best_Model_Registration"):
     mlflow.sklearn.log_model(
         sk_model=best_models[best_model_name],
@@ -117,4 +118,3 @@ with mlflow.start_run(run_name="Best_Model_Registration"):
         registered_model_name="CreditRiskModel"
     )
 print("Best model registered in MLflow Model Registry 🚀")
-
